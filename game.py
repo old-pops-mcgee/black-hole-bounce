@@ -1,3 +1,4 @@
+import math
 import random
 
 import pyray
@@ -10,7 +11,7 @@ from entities.point import Point
 class Game:
     WINDOW_HEIGHT = 800
     WINDOW_WIDTH = 1200
-    MAX_POINTS = 15
+    MAX_POINTS = 5
 
     def __init__(self):
         pyray.init_window(self.WINDOW_WIDTH, self.WINDOW_HEIGHT, "Black Hole Bounce")
@@ -22,7 +23,7 @@ class Game:
         self.reload_game_components()
 
     def reload_game_components(self):
-        self.ball = Ball(self, (240, 250), 5, pyray.YELLOW)
+        self.ball = Ball(self, (self.WINDOW_WIDTH / 2, self.WINDOW_HEIGHT / 2), 5, pyray.YELLOW)
         self.black_hole_list = []
         self.point_list = []
         for i in range(self.MAX_POINTS):
@@ -66,24 +67,22 @@ class Game:
         pyray.end_drawing()
 
     def handle_input(self):
-        if pyray.is_mouse_button_pressed(pyray.MouseButton.MOUSE_BUTTON_LEFT):
-            # add a black hole
-            mouse_position = pyray.get_mouse_position()
-            processed_click = False
-            for black_hole in self.black_hole_list:
-                if pyray.check_collision_point_circle(mouse_position, black_hole.pos, black_hole.radius):
-                    black_hole.force += black_hole.STANDARD_FORCE
-                    black_hole.radius += 10.0
-                    black_hole.death_radius += 2.0
-                    black_hole.level += 1
-                    processed_click = True
-            if not processed_click:
-                self.black_hole_list.append(BlackHole(self, (mouse_position.x, mouse_position.y), 45.0))
+        if pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT):
+            self.ball.angle += math.pi/60
+        if pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT):
+            self.ball.angle -= math.pi/60
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_UP):
+            self.ball.engine_speed += 0.5
+        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_DOWN):
+            self.ball.engine_speed -= 0.5
 
     def score_point(self, point):
         self.score += 100
         self.point_list.remove(point)
         self.point_list.append(self.generate_random_point())
+
+    def add_black_hole(self, pos):
+        self.black_hole_list.append(BlackHole(self, pos, 45.0))
 
     def generate_random_point(self):
         point_x = random.randrange(0, self.WINDOW_WIDTH)

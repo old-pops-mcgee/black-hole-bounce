@@ -21,6 +21,7 @@ class BlackHole:
         self.force += self.DECAYING_FORCE_ADDER
         if self.radius < self.DECAY_RATE:
             self.game.black_hole_list.remove(self)
+            self.game.point_list.append(self.game.generate_random_point())
 
     def render(self):
         # Render hole from out to in: RED -> ORANGE -> YELLOW -> BLACK
