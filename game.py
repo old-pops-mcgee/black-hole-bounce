@@ -43,6 +43,9 @@ class Game:
         # Instantiate the core components
         self.reload_game_components()
 
+        # Set the state
+        self.game_state = 'START' # Also has 'PLAY' and 'RESTART'
+
 
 
     def reload_game_components(self):
@@ -64,31 +67,32 @@ class Game:
     def update(self):
         if not pyray.is_sound_playing(self.sounds['music']):
             pyray.play_sound(self.sounds['music'])
-        if self.ship.is_dead:
-            if not self.added_final_explosion:
-                self.create_new_explosion(self.ship.pos, 50)
-                self.added_final_explosion = True
-            self.restart_counter -= 1
-        if self.restart_counter <= 0:
-            self.reload_game_components() # TODO: Pretty up the transition
-        self.asteroid_countdown -= 1
-        self.star_addition_countdown -= 1
-        if not self.ship.is_dead:
-            self.score += 1
-        if self.asteroid_countdown <= 0:
-            self.create_new_asteroid()
-        if self.star_addition_countdown <= 0:
-            self.star_multiplier = min(5, self.star_multiplier + 1)
-            self.star_addition_countdown = 1800
-        self.ship.update()
-        for black_hole in self.black_hole_list:
-            black_hole.update()
-        for point in self.star_list:
-            point.update()
-        for asteroid in self.asteroid_list:
-            asteroid.update()
-        for explosion in self.explosion_list:
-            explosion.update()
+        if self.game_state == 'PLAY':
+            if self.ship.is_dead:
+                if not self.added_final_explosion:
+                    self.create_new_explosion(self.ship.pos, 50)
+                    self.added_final_explosion = True
+                self.restart_counter -= 1
+            if self.restart_counter <= 0:
+                self.game_state = 'RESTART'
+            self.asteroid_countdown -= 1
+            self.star_addition_countdown -= 1
+            if not self.ship.is_dead:
+                self.score += 1
+            if self.asteroid_countdown <= 0:
+                self.create_new_asteroid()
+            if self.star_addition_countdown <= 0:
+                self.star_multiplier = min(5, self.star_multiplier + 1)
+                self.star_addition_countdown = 1800
+            self.ship.update()
+            for black_hole in self.black_hole_list:
+                black_hole.update()
+            for point in self.star_list:
+                point.update()
+            for asteroid in self.asteroid_list:
+                asteroid.update()
+            for explosion in self.explosion_list:
+                explosion.update()
 
     def run(self):
         while not pyray.window_should_close():
@@ -106,31 +110,53 @@ class Game:
 
         # Background
         pyray.draw_texture(self.images['background'], 0, 0, (255, 255, 255, 100))
-        # Game elements
-        for point in self.star_list:
-            point.render()
-        for black_hole in self.black_hole_list:
-            black_hole.render()
-        for asteroid in self.asteroid_list:
-            asteroid.render()
-        for explosion in self.explosion_list:
-            explosion.render()
-        self.ship.render()
 
-        # UI elements
-        pyray.draw_text(f"Score: {self.score}", 10, 10, 20, pyray.RAYWHITE)
+        if self.game_state == 'PLAY':
+            # Game elements
+            for point in self.star_list:
+                point.render()
+            for black_hole in self.black_hole_list:
+                black_hole.render()
+            for asteroid in self.asteroid_list:
+                asteroid.render()
+            for explosion in self.explosion_list:
+                explosion.render()
+            self.ship.render()
+
+            # UI elements
+            pyray.draw_text(f"Score: {self.score}", 10, 10, 20, pyray.RAYWHITE)
+        if self.game_state == 'START':
+            pyray.draw_text("Black Hole Bounce", 600, 300, 64, pyray.RAYWHITE)
+            pyray.draw_text("Stay Alive as Long as You Can!", 400, 350, 64, pyray.RAYWHITE)
+
+            pyray.draw_text("Left/Right arrows: Turn", 600, 450, 48, pyray.RAYWHITE)
+            pyray.draw_text("Up/Down arrows: Accelerate/Decelerate", 400, 500, 48, pyray.RAYWHITE)
+            pyray.draw_text("Press Space to Start!", 520, 600, 64, pyray.RAYWHITE)
+
+        if self.game_state == 'RESTART':
+            pyray.draw_text(f"Final Score: {self.score}", 620, 300, 64, pyray.RAYWHITE)
+            pyray.draw_text("Play Again?", 685, 350, 64, pyray.RAYWHITE)
+
+            pyray.draw_text("Left/Right arrows: Turn", 600, 450, 48, pyray.RAYWHITE)
+            pyray.draw_text("Up/Down arrows: Accelerate/Decelerate", 400, 500, 48, pyray.RAYWHITE)
+            pyray.draw_text("Press Space to Start!", 520, 600, 64, pyray.RAYWHITE)
 
         pyray.end_drawing()
 
     def handle_input(self):
-        if pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT):
-            self.ship.angle += math.pi / 60
-        if pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT):
-            self.ship.angle -= math.pi / 60
-        if pyray.is_key_down(pyray.KeyboardKey.KEY_UP):
-            self.ship.increase_speed()
-        if pyray.is_key_down(pyray.KeyboardKey.KEY_DOWN):
-            self.ship.decrease_speed()
+        if self.game_state == 'PLAY':
+            if pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT):
+                self.ship.angle += math.pi / 60
+            if pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT):
+                self.ship.angle -= math.pi / 60
+            if pyray.is_key_down(pyray.KeyboardKey.KEY_UP):
+                self.ship.increase_speed()
+            if pyray.is_key_down(pyray.KeyboardKey.KEY_DOWN):
+                self.ship.decrease_speed()
+        if (self.game_state == 'START') or (self.game_state == 'RESTART'):
+            if pyray.is_key_pressed(pyray.KeyboardKey.KEY_SPACE):
+                self.reload_game_components()
+                self.game_state = 'PLAY'
 
     def add_black_hole(self, pos):
         self.black_hole_list.append(BlackHole(self, pos, 45.0, self.images['black_hole']))
