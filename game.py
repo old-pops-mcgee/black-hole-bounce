@@ -60,10 +60,6 @@ class Game:
         pyray.begin_drawing()
         pyray.clear_background(pyray.DARKPURPLE)
 
-        # UI elements
-        pyray.draw_text(f"Score: {self.score}", 10, 10, 20, pyray.RAYWHITE)
-        pyray.draw_text(f"Black Holes Left: {self.MAX_BLACK_HOLES - self.black_hole_count}", 10, 30, 20, pyray.RAYWHITE)
-        pyray.draw_text(f"Time Left: {int(self.counter_to_game_over / 60) + 1}", 10, 50, 20, pyray.RAYWHITE)
         # Game elements
         self.paddle.render()
         self.ball.render()
@@ -71,6 +67,13 @@ class Game:
             point.render()
         for black_hole in self.black_hole_list:
             black_hole.render()
+
+        # UI elements
+        pyray.draw_text(f"Score: {self.score}", 10, 10, 20, pyray.RAYWHITE)
+        pyray.draw_text(f"Black Holes Left: {self.MAX_BLACK_HOLES - self.black_hole_count}", 10, 30, 20,
+                        pyray.RAYWHITE)
+        pyray.draw_text(f"Time Left: {int(self.counter_to_game_over / 60) + 1}", 10, 50, 20, pyray.RAYWHITE)
+
         pyray.end_drawing()
 
     def handle_input(self):
