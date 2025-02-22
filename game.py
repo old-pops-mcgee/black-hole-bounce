@@ -31,6 +31,14 @@ class Game:
             'background': raylib_utils.load_image_to_texture('background.png')
         }
 
+        self.sounds = {
+            'music': pyray.load_sound('assets/sound/scifi_background.wav'),
+            'explosion': pyray.load_sound('assets/sound/explosion.wav'),
+            'engine': pyray.load_sound('assets/sound/engine.wav')
+        }
+
+        pyray.play_sound(self.sounds['music'])
+
         # Instantiate the core components
         self.reload_game_components()
 
@@ -53,6 +61,8 @@ class Game:
         self.score = 0
 
     def update(self):
+        if not pyray.is_sound_playing(self.sounds['music']):
+            pyray.play_sound(self.sounds['music'])
         if self.ship.is_dead:
             if not self.added_final_explosion:
                 self.create_new_explosion(self.ship.pos, 50)

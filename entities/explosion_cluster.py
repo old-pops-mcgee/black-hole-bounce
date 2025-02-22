@@ -1,6 +1,8 @@
 import math
 import random
 
+import pyray
+
 from entities.explosion import Explosion
 
 
@@ -14,6 +16,7 @@ class ExplosionCluster:
             pos_x = self.pos[0] + random.randrange(-5, 5)
             pos_y = self.pos[1] + random.randrange(-5, 5)
             self.explosions.append(Explosion(self, (pos_x, pos_y), random.random() * 2 * math.pi, random.random() * 5.0))
+        pyray.play_sound(self.game.sounds['explosion'])
 
     def render(self):
         for explosion in self.explosions:
