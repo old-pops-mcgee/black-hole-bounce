@@ -4,7 +4,7 @@ import random
 import pyray
 
 class Star:
-    RENDER_SCALE = 2.0
+    RENDER_SCALE = 1.5
     def __init__(self, game, pos, radius, texture):
         self.game = game
         self.pos = list(pos)

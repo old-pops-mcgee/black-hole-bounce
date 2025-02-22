@@ -32,7 +32,8 @@ class BlackHole:
             self.angle -= self.rotation_speed
         if self.radius < self.DECAY_RATE:
             self.game.black_hole_list.remove(self)
-            self.game.star_list.append(self.game.generate_random_star())
+            for i in range(self.game.star_multiplier):
+                self.game.star_list.append(self.game.generate_random_star())
 
     def render(self):
         scale = self.radius / self.initial_radius

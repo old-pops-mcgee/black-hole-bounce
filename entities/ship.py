@@ -12,37 +12,31 @@ class Ship:
         self.color = color
         self.angle = 0.0
         self.texture = texture
-
-        self.width = self.texture.width
-        self.height = self.texture.height
-
-
         self.velocity = [0.0, 0.0] # X velocity, Y velocity
         self.engine_speed = 0.0
 
     def render(self):
         pyray.draw_texture_pro(
             self.texture,
-            pyray.Rectangle(0, 0, self.width, self.height),
-            pyray.Rectangle(self.pos[0], self.pos[1], self.width, self.height),
-            (self.width / 2, self.height / 2),
+            pyray.Rectangle(0, 0, self.texture.width, self.texture.height),
+            pyray.Rectangle(self.pos[0], self.pos[1], self.texture.width, self.texture.height),
+            (self.texture.width / 2, self.texture.height / 2),
             self.angle * (180 / math.pi) + 90,
             pyray.WHITE
         )
 
     def update(self):
-        # Cap engine speed - maybe
-        #self.engine_speed = min(self.MAX_SPEED, max(0, self.engine_speed))
-
-        # Check to see if we've scored
-        for star in self.game.star_list:
-            if pyray.check_collision_circles(self.pos, self.radius, star.pos, star.radius):
-                self.game.score_point(star)
-
-        # Adjust if we went out of bounds
+        # Blow up if we've gone out of bounds
         if self.pos[1] < 0 or self.pos[1] > self.game.WINDOW_HEIGHT or self.pos[0] < 0 or self.pos[0] > self.game.WINDOW_WIDTH:
             self.game.game_over = True
             return
+
+        # Blow up if we've collided with an asteroid
+        for asteroid in self.game.asteroid_list:
+            ax, ay, ar = asteroid.get_collision_circle()
+            if pyray.check_collision_circles(self.pos, self.radius, (ax, ay), ar):
+                self.game.game_over = True
+                return
 
         # Check to see if we've been crushed
         for black_hole in self.game.black_hole_list:
