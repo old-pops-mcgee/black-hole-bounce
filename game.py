@@ -4,6 +4,7 @@ import random
 import pyray
 
 from entities.asteroid import Asteroid
+from entities.explosion_cluster import ExplosionCluster
 from entities.ship import Ship
 from entities.black_hole import BlackHole
 from entities.star import Star
@@ -40,21 +41,29 @@ class Game:
         self.black_hole_list = []
         self.star_list = []
         self.asteroid_list = []
+        self.explosion_list = []
+        self.added_final_explosion = False
+        self.restart_counter = 120
         self.asteroid_countdown_range = (180, 300)
         self.star_addition_countdown = 1800 # Get harder every 30 seconds
         self.star_multiplier = 1
         self.asteroid_countdown = random.randint(self.asteroid_countdown_range[0], self.asteroid_countdown_range[1])
         for i in range(self.MAX_STARS):
             self.star_list.append(self.generate_random_star())
-        self.game_over = False
         self.score = 0
 
     def update(self):
-        if self.game_over:
+        if self.ship.is_dead:
+            if not self.added_final_explosion:
+                self.create_new_explosion(self.ship.pos, 50)
+                self.added_final_explosion = True
+            self.restart_counter -= 1
+        if self.restart_counter <= 0:
             self.reload_game_components() # TODO: Pretty up the transition
         self.asteroid_countdown -= 1
         self.star_addition_countdown -= 1
-        self.score += 1
+        if not self.ship.is_dead:
+            self.score += 1
         if self.asteroid_countdown <= 0:
             self.create_new_asteroid()
         if self.star_addition_countdown <= 0:
@@ -67,6 +76,8 @@ class Game:
             point.update()
         for asteroid in self.asteroid_list:
             asteroid.update()
+        for explosion in self.explosion_list:
+            explosion.update()
 
     def run(self):
         while not pyray.window_should_close():
@@ -91,6 +102,8 @@ class Game:
             black_hole.render()
         for asteroid in self.asteroid_list:
             asteroid.render()
+        for explosion in self.explosion_list:
+            explosion.render()
         self.ship.render()
 
         # UI elements
@@ -151,3 +164,6 @@ class Game:
         self.asteroid_list.append(Asteroid(self, pos, 10.0, self.images['asteroid'], initial_velocity))
         self.asteroid_countdown_range = (max(20, self.asteroid_countdown_range[0] - 10), max(40, self.asteroid_countdown_range[1] - 10))
         self.asteroid_countdown = random.randint(self.asteroid_countdown_range[0], self.asteroid_countdown_range[1])
+
+    def create_new_explosion(self, pos, explosion_count):
+        self.explosion_list.append(ExplosionCluster(self, pos, explosion_count))

@@ -29,6 +29,7 @@ class Asteroid:
         for black_hole in self.game.black_hole_list:
             if pyray.check_collision_circles(self.pos, self.radius, black_hole.pos, black_hole.death_radius):
                 self.game.asteroid_list.remove(self)
+                self.game.create_new_explosion(self.pos, 15)
                 return
 
         # Calculate velocity updates from black hole gravity
