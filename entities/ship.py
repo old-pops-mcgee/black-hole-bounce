@@ -1,9 +1,11 @@
 import math
+import random
 
 import pyray
 
 class Ship:
     MAX_SPEED = 5.0
+    MAX_ENGINE_SPEED = 50.0
 
     def __init__(self, game, pos, radius, color, texture):
         self.game = game
@@ -14,6 +16,7 @@ class Ship:
         self.texture = texture
         self.velocity = [0.0, 0.0] # X velocity, Y velocity
         self.engine_speed = 0.0
+        self.vapor_trail = []
 
     def render(self):
         pyray.draw_texture_pro(
@@ -25,7 +28,13 @@ class Ship:
             pyray.WHITE
         )
 
+        for vapor_dot in self.vapor_trail.copy():
+            pyray.draw_circle(vapor_dot[0], vapor_dot[1], vapor_dot[2], (255, 95, 31, 100))
+
     def update(self):
+        # Put a floor on the engine speed
+        self.engine_speed = min(self.MAX_ENGINE_SPEED, max(0, self.engine_speed))
+
         # Blow up if we've gone out of bounds
         if self.pos[1] < 0 or self.pos[1] > self.game.WINDOW_HEIGHT or self.pos[0] < 0 or self.pos[0] > self.game.WINDOW_WIDTH:
             self.game.game_over = True
@@ -58,3 +67,22 @@ class Ship:
         self.velocity[0] = min(self.MAX_SPEED, max(-self.MAX_SPEED, self.velocity[0]))
         self.velocity[1] = min(self.MAX_SPEED, max(-self.MAX_SPEED, self.velocity[1]))
 
+        # Update the vapor trail
+        for vapor_dot in self.vapor_trail:
+            vapor_dot[2] -= 0.1
+            if vapor_dot[2] <= 0:
+                self.vapor_trail.remove(vapor_dot)
+
+        # Add vapor dots to the trail
+        vapor_fudge_factor = (random.random() - 0.5) * 8.0
+        theta = (math.pi/2) - self.angle
+        vapor_x = self.pos[0] - (self.texture.height + vapor_fudge_factor) * math.sin(theta) / 2
+        vapor_y = self.pos[1] - (self.texture.height + vapor_fudge_factor) * math.cos(theta) / 2
+
+        self.vapor_trail.append([int(vapor_x), int(vapor_y), self.engine_speed / 2.0])
+
+    def increase_speed(self):
+        self.engine_speed += 0.1
+
+    def decrease_speed(self):
+        self.engine_speed -= 0.1

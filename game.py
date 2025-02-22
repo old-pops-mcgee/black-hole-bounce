@@ -26,7 +26,8 @@ class Game:
             'ship': raylib_utils.load_image_to_texture('ship.png'),
             'star': raylib_utils.load_image_to_texture('star.png'),
             'asteroid': raylib_utils.load_image_to_texture('asteroid.png'),
-            'black_hole': raylib_utils.load_image_to_texture('black_hole.png')
+            'black_hole': raylib_utils.load_image_to_texture('black_hole.png'),
+            'background': raylib_utils.load_image_to_texture('background.png')
         }
 
         # Instantiate the core components
@@ -79,8 +80,10 @@ class Game:
 
     def render(self):
         pyray.begin_drawing()
-        pyray.clear_background(pyray.DARKPURPLE)
+        pyray.clear_background(pyray.BLACK)
 
+        # Background
+        pyray.draw_texture(self.images['background'], 0, 0, (255, 255, 255, 100))
         # Game elements
         for point in self.star_list:
             point.render()
@@ -100,10 +103,10 @@ class Game:
             self.ship.angle += math.pi / 60
         if pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT):
             self.ship.angle -= math.pi / 60
-        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_UP):
-            self.ship.engine_speed += 0.5
-        if pyray.is_key_pressed(pyray.KeyboardKey.KEY_DOWN):
-            self.ship.engine_speed -= 0.5
+        if pyray.is_key_down(pyray.KeyboardKey.KEY_UP):
+            self.ship.increase_speed()
+        if pyray.is_key_down(pyray.KeyboardKey.KEY_DOWN):
+            self.ship.decrease_speed()
 
     def add_black_hole(self, pos):
         self.black_hole_list.append(BlackHole(self, pos, 45.0, self.images['black_hole']))
