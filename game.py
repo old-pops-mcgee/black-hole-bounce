@@ -8,8 +8,8 @@ from entities.point import Point
 
 
 class Game:
-    WINDOW_HEIGHT = 720
-    WINDOW_WIDTH = 1080
+    WINDOW_HEIGHT = 800
+    WINDOW_WIDTH = 1200
     MAX_POINTS = 15
 
     def __init__(self):

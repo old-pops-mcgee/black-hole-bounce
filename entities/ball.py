@@ -14,6 +14,7 @@ class Ball:
         self.velocity = [0.0, 0.0] # X velocity, Y velocity
 
     def render(self):
+        pyray.draw_triangle
         pyray.draw_circle(int(self.pos[0]), int(self.pos[1]), self.radius, self.color)
 
     def update(self):
