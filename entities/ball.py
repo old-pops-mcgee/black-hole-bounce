@@ -15,6 +15,16 @@ class Ball:
         pyray.draw_circle(int(self.pos[0]), int(self.pos[1]), self.radius, self.color)
 
     def update(self):
+        # Check if we're off screen
+        if self.pos[1] > self.game.WINDOW_HEIGHT:
+            self.game.game_over = True
+            return
+
+        # Check to see if we've scored
+        for point in self.game.point_list:
+            if pyray.check_collision_circles(self.pos, self.radius, point.pos, point.radius):
+                self.game.score_point(point)
+
         # Adjust for impulse from paddle
         if pyray.check_collision_circle_rec(self.pos, self.radius, self.game.paddle.get_pyray_rec()):
             self.velocity[1] = -10.0

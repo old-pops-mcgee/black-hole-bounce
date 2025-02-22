@@ -20,7 +20,9 @@ class BlackHole:
         pyray.draw_circle(int(self.pos[0]), int(self.pos[1]), self.radius * 0.85, pyray.BLACK)
 
     def calculate_force_on_ball(self, ball_x, ball_y):
-        angle = math.atan((self.pos[1] - ball_y) / (self.pos[0] - ball_x))
+        fudge_factor = 0 if self.pos != ball_x else 1
+        angle = math.atan((self.pos[1] - ball_y) / (self.pos[0] - ball_x - fudge_factor))
+
         dis = math.sqrt(math.pow(self.pos[1] - ball_y, 2) + math.pow(self.pos[0] - ball_x, 2))
 
         # Normal equation is G*(mass1*mass2)/dis^2
