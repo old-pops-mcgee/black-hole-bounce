@@ -16,7 +16,7 @@ class BlackHole:
         self.radius = radius
         self.force = self.STANDARD_FORCE
         self.level = 1
-        self.death_radius = 0.2*self.radius
+        self.death_radius = 0.4*self.radius
         self.texture = texture
         self.angle = random.random() * 2*math.pi
         self.turning_direction = random.randint(0, 1)
@@ -24,7 +24,7 @@ class BlackHole:
 
     def update(self):
         self.radius -= self.DECAY_RATE
-        self.death_radius -= 0.2*self.DECAY_RATE
+        self.death_radius -= 0.4*self.DECAY_RATE
         self.force += self.DECAYING_FORCE_ADDER
         if self.turning_direction:
             self.angle += self.rotation_speed

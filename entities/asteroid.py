@@ -1,3 +1,6 @@
+import math
+import random
+
 import pyray
 
 
@@ -8,9 +11,13 @@ class Asteroid:
         self.radius = radius
         self.texture = texture
         self.velocity = list(velocity)
+        self.vapor_trail = []
 
     def render(self):
         pyray.draw_texture(self.texture, int(self.pos[0]), int(self.pos[1]), pyray.WHITE)
+
+        for vapor_dot in self.vapor_trail.copy():
+            pyray.draw_circle(vapor_dot[0], vapor_dot[1], vapor_dot[2], (255, 190, 51, 100))
 
     def update(self):
         # Remove if we've gone out of bounds
@@ -33,6 +40,15 @@ class Asteroid:
         # Calculate new position
         self.pos[0] += self.velocity[0]
         self.pos[1] += self.velocity[1]
+
+        # Update the vapor trail
+        for vapor_dot in self.vapor_trail:
+            vapor_dot[2] -= 0.1
+            if vapor_dot[2] <= 0:
+                self.vapor_trail.remove(vapor_dot)
+
+        # Add vapor dots to the trail
+        self.vapor_trail.append([int(self.pos[0] + self.texture.width / 2), int(self.pos[1] + self.texture.height / 2), 3.0])
 
     def get_collision_circle(self):
         pos_x = self.pos[0] + (self.texture.width / 2)
