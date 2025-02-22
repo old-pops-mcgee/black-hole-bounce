@@ -2,15 +2,25 @@ import math
 import pyray
 
 class BlackHole:
-    STANDARD_FORCE = 4000.0
+    STANDARD_FORCE = 2500.0
+    FUDGE_FACTOR = 3.5
+    DECAYING_FORCE_ADDER = 20.0
+    DECAY_RATE = 0.25
     def __init__(self, game, pos, radius):
         self.game = game
         self.pos = list(pos)
         self.radius = radius
         self.force = self.STANDARD_FORCE
+        self.level = 1
+        self.death_radius = 0.2*self.radius
 
     def update(self):
-        pass # TODO: Add animation effects on the black hole
+        # TODO: Add animation effects on the black hole
+        self.radius -= self.DECAY_RATE
+        self.death_radius -= 0.2*self.DECAY_RATE
+        self.force += self.DECAYING_FORCE_ADDER
+        if self.radius < self.DECAY_RATE:
+            self.game.black_hole_list.remove(self)
 
     def render(self):
         # Render hole from out to in: RED -> ORANGE -> YELLOW -> BLACK
@@ -27,7 +37,7 @@ class BlackHole:
         # Gravity being applied separately, need to calculate component of force on each end
         # Hardcode force as something over the distance squared
         # Add a 'fudge factor' to give players more reaction time
-        g_force = self.force / (math.pow(dis, 2))
+        g_force = self.force / (self.FUDGE_FACTOR*math.pow(dis, 2))
         x_force = math.cos(angle) * g_force
         y_force = math.sin(angle) * g_force
 
