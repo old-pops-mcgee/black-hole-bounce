@@ -3,15 +3,16 @@ import random
 
 import pyray
 
-from entities.ball import Ball
+from entities.ship import Ship
 from entities.black_hole import BlackHole
-from entities.point import Point
+from entities.star import Star
+from utilities import raylib_utils
 
 
 class Game:
-    WINDOW_HEIGHT = 800
-    WINDOW_WIDTH = 1200
-    MAX_POINTS = 5
+    WINDOW_HEIGHT = 972
+    WINDOW_WIDTH = 1728
+    MAX_STARS = 5
 
     def __init__(self):
         pyray.init_window(self.WINDOW_WIDTH, self.WINDOW_HEIGHT, "Black Hole Bounce")
@@ -19,25 +20,35 @@ class Game:
 
         pyray.set_target_fps(60)
 
+        # Load assets
+        self.images = {
+            'ship': raylib_utils.load_image_to_texture('ship.png'),
+            'star': raylib_utils.load_image_to_texture('star.png'),
+            'asteroid': raylib_utils.load_image_to_texture('asteroid.png'),
+            'black_hole': raylib_utils.load_image_to_texture('black_hole.png')
+        }
+
         # Instantiate the core components
         self.reload_game_components()
 
+
+
     def reload_game_components(self):
-        self.ball = Ball(self, (self.WINDOW_WIDTH / 2, self.WINDOW_HEIGHT / 2), 5, pyray.YELLOW)
+        self.ship = Ship(self, (self.WINDOW_WIDTH / 2, self.WINDOW_HEIGHT / 2), 5, pyray.YELLOW, self.images['ship'])
         self.black_hole_list = []
-        self.point_list = []
-        for i in range(self.MAX_POINTS):
-            self.point_list.append(self.generate_random_point())
+        self.star_list = []
+        for i in range(self.MAX_STARS):
+            self.star_list.append(self.generate_random_star())
         self.game_over = False
         self.score = 0
 
     def update(self):
         if self.game_over:
             self.reload_game_components() # TODO: Pretty up the transition
-        self.ball.update()
+        self.ship.update()
         for black_hole in self.black_hole_list:
             black_hole.update()
-        for point in self.point_list:
+        for point in self.star_list:
             point.update()
 
     def run(self):
@@ -55,8 +66,8 @@ class Game:
         pyray.clear_background(pyray.DARKPURPLE)
 
         # Game elements
-        self.ball.render()
-        for point in self.point_list:
+        self.ship.render()
+        for point in self.star_list:
             point.render()
         for black_hole in self.black_hole_list:
             black_hole.render()
@@ -68,24 +79,23 @@ class Game:
 
     def handle_input(self):
         if pyray.is_key_down(pyray.KeyboardKey.KEY_RIGHT):
-            self.ball.angle += math.pi/60
+            self.ship.angle += math.pi / 60
         if pyray.is_key_down(pyray.KeyboardKey.KEY_LEFT):
-            self.ball.angle -= math.pi/60
+            self.ship.angle -= math.pi / 60
         if pyray.is_key_pressed(pyray.KeyboardKey.KEY_UP):
-            self.ball.engine_speed += 0.5
+            self.ship.engine_speed += 0.5
         if pyray.is_key_pressed(pyray.KeyboardKey.KEY_DOWN):
-            self.ball.engine_speed -= 0.5
+            self.ship.engine_speed -= 0.5
 
     def score_point(self, point):
         self.score += 100
-        self.point_list.remove(point)
-        self.point_list.append(self.generate_random_point())
+        self.star_list.remove(point)
+        self.star_list.append(self.generate_random_star())
 
     def add_black_hole(self, pos):
-        self.black_hole_list.append(BlackHole(self, pos, 45.0))
+        self.black_hole_list.append(BlackHole(self, pos, 45.0, self.images['black_hole']))
 
-    def generate_random_point(self):
-        point_x = random.randrange(0, self.WINDOW_WIDTH)
-        point_y = random.randrange(0, self.WINDOW_HEIGHT)
-        rotation = random.randrange(0, 72)
-        return Point(self, (point_x, point_y), 5, 15.0, pyray.GOLD, rotation)
+    def generate_random_star(self):
+        point_x = random.randrange(20, self.WINDOW_WIDTH - 20)
+        point_y = random.randrange(20, self.WINDOW_HEIGHT - 20)
+        return Star(self, (point_x, point_y), 5, self.images['star'])
