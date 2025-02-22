@@ -30,6 +30,7 @@ class Game:
             'black_hole': raylib_utils.load_image_to_texture('black_hole.png'),
             'background': raylib_utils.load_image_to_texture('background.png')
         }
+        pyray.set_window_icon(pyray.load_image('assets/images/icon.png'))
 
         self.sounds = {
             'music': pyray.load_sound('assets/sound/scifi_background.wav'),
