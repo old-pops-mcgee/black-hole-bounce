@@ -20,22 +20,15 @@ class BlackHole:
         pyray.draw_circle(int(self.pos[0]), int(self.pos[1]), self.radius * 0.85, pyray.BLACK)
 
     def calculate_force_on_ball(self, ball_x, ball_y):
-        fudge_factor = 0 if self.pos != ball_x else 1
-        angle = math.atan((self.pos[1] - ball_y) / (self.pos[0] - ball_x - fudge_factor))
-
+        angle = math.atan2((self.pos[1] - ball_y), (self.pos[0] - ball_x))
         dis = math.sqrt(math.pow(self.pos[1] - ball_y, 2) + math.pow(self.pos[0] - ball_x, 2))
 
         # Normal equation is G*(mass1*mass2)/dis^2
         # Gravity being applied separately, need to calculate component of force on each end
         # Hardcode force as something over the distance squared
-        g_force = self.force / math.pow(dis, 2)
-        x_force = abs(math.cos(angle) * g_force)
-        if self.pos[0] < ball_x:
-            # black hole to left of ball, so pull ball left
-            x_force *= -1
+        # Add a 'fudge factor' to give players more reaction time
+        g_force = self.force / (math.pow(dis, 2))
+        x_force = math.cos(angle) * g_force
         y_force = math.sin(angle) * g_force
-        if self.pos[1] < ball_y:
-            # black hole above ball, so pull ball up
-            y_force *= -1
 
         return x_force, y_force
