@@ -1,4 +1,4 @@
-# black-hole-bounce
+# Black Hole Bounce
 Stay on screen as long as you can, before the black holes suck you in!
 
 This is an entry for the 21st Alakajam: https://alakajam.com/21st-alakajam
