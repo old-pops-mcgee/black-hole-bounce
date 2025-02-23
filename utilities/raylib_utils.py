@@ -1,5 +1,3 @@
-import os
-
 import pyray
 
 BASE_IMG_PATH = 'assets/images/'

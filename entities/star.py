@@ -42,4 +42,3 @@ class Star:
             self.angle * (180 / math.pi),
             color
         )
-        #pyray.draw_poly(self.pos, self.sides, self.radius, self.rotation, color)
